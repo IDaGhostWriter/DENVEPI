@@ -13,7 +13,7 @@
   --bg:#F3F6F6; --panel:#FFFFFF; --ink:#122023; --ink-2:#465659; --muted:#6F7F82; --line:#D9E2E3; --soft:#EAF0F0;
   --accent:#0E6B73; --accent-ink:#FFFFFF; --land:#E7EDEC; --land-2:#F6F8F8; --water:#DCE9EC;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#6250d6; --s8:#e34948;
-  --neutral:#AEB9BB; --warn:#B4540A; --good:#1E7A4C;
+  --neutral:#8E9B9E; --neg:#D3DCDD; --warn:#B4540A; --good:#1E7A4C;
   --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
   --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -22,12 +22,12 @@
   --bg:#0E1517; --panel:#162023; --ink:#E6EEEF; --ink-2:#A7B6B9; --muted:#7E8D90; --line:#26363A; --soft:#1C292C;
   --accent:#5DB8C0; --accent-ink:#0E1517; --land:#1F2C2F; --land-2:#182326; --water:#12202A;
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
-  --neutral:#4D5C60; --warn:#E39A55; --good:#5CC48E; color-scheme:dark}}
+  --neutral:#6A797D; --neg:#2C3B3F; --warn:#E39A55; --good:#5CC48E; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0E1517; --panel:#162023; --ink:#E6EEEF; --ink-2:#A7B6B9; --muted:#7E8D90; --line:#26363A; --soft:#1C292C;
   --accent:#5DB8C0; --accent-ink:#0E1517; --land:#1F2C2F; --land-2:#182326; --water:#12202A;
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
-  --neutral:#4D5C60; --warn:#E39A55; --good:#5CC48E; color-scheme:dark}
+  --neutral:#6A797D; --neg:#2C3B3F; --warn:#E39A55; --good:#5CC48E; color-scheme:dark}
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
@@ -87,8 +87,8 @@ select{font:inherit;font-size:13.5px;color:var(--ink);background:var(--bg);borde
 /* panels */
 .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
-.c7{grid-column:span 7}.c5{grid-column:span 5}.c12{grid-column:span 12}.c4{grid-column:span 4}.c8{grid-column:span 8}
-@media (max-width:980px){.c7,.c5,.c4,.c8{grid-column:span 12}}
+.c6{grid-column:span 6}.c7{grid-column:span 7}.c5{grid-column:span 5}.c12{grid-column:span 12}.c4{grid-column:span 4}.c8{grid-column:span 8}
+@media (max-width:980px){.c7,.c6,.c5,.c4,.c8{grid-column:span 12}}
 .phead{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:flex-start;justify-content:space-between}
 .phead p{margin:2px 0 0;color:var(--muted);font-size:13px;max-width:62ch}
 .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -172,6 +172,7 @@ footer{color:var(--muted);font-size:12.5px}
 
 <section class="filters" aria-label="Filters">
   <span class="eyebrow">Filters</span>
+  <label>PCR result <select id="fPcr"><option value="">All</option><option value="pos">Positive</option><option value="neg">Negative</option></select></label>
   <div class="fchips" id="seroChips" role="group" aria-label="Serotype"></div>
   <label>Genotype <select id="fGeno"></select></label>
   <label>Locality <select id="fLoc"></select></label>
@@ -186,7 +187,7 @@ footer{color:var(--muted);font-size:12.5px}
 <div class="grid">
   <section class="panel c7">
     <div class="phead">
-      <div><h2>Spatial distribution</h2><p>PCR-positive cases by locality. Circle area = positives; slices = serotype share. Grey rings: localities with tested samples only.</p></div>
+      <div><h2>Spatial distribution</h2><p id="mapSub">Samples tested by locality. Circle area = samples tested; slices = PCR positive vs negative.</p></div>
       <div class="controls">
         <div class="seg" id="mapMode" role="group" aria-label="Time window">
           <button type="button" data-v="cum" aria-pressed="true">Cumulative</button>
@@ -213,7 +214,7 @@ footer{color:var(--muted);font-size:12.5px}
 
   <section class="panel c12">
     <div class="phead">
-      <div><h2>Epidemic curve</h2><p>PCR-positive cases per epi-week (ISO, Monday start), stacked by serotype. Below: share of tested samples that were positive.</p></div>
+      <div><h2>Epidemic curve</h2><p>Samples tested per epi-week (ISO, Monday start): PCR-positive stacked by serotype or genotype, PCR-negative on top in light grey. Use the PCR result filter to show one or the other. Below: share of tested samples that were positive.</p></div>
       <div class="controls">
         <div class="seg" id="epiBy" role="group" aria-label="Stack by">
           <button type="button" data-v="Serotype" aria-pressed="true">By serotype</button>
@@ -254,12 +255,18 @@ footer{color:var(--muted);font-size:12.5px}
     </div>
   </section>
 
-  <section class="panel c4" id="pyrPanel">
+  <section class="panel c4" id="pcrPanel">
+    <div class="phead"><div><h2 id="pcrTitle">PCR results</h2><p id="pcrSub">Share of tested samples.</p></div></div>
+    <div class="chart" id="pcrPie"></div>
+    <div class="legend" id="pcrLegend"></div>
+  </section>
+
+  <section class="panel c8" id="pyrPanel">
     <div class="phead"><div><h2>Age and sex of positives</h2><p>PCR-positive cases by age band.</p></div></div>
     <div class="chart" id="pyr"></div>
   </section>
 
-  <section class="panel c8" id="llPanel">
+  <section class="panel c12" id="llPanel">
     <div class="phead">
       <div><h2>Line list</h2><p id="llCount">—</p></div>
       <input type="search" id="llSearch" placeholder="Search ID, locality, genotype" aria-label="Search line list">
@@ -318,8 +325,8 @@ const FOCUS="DENV-2/GVI";
 const tip=$("#tip");
 
 const S={rows:[],hasDate:false,weeks:[],tree:null,src:"example",csvText:null,csvName:null,nwkText:null,nwkName:null,
-  f:{sero:new Set(),geno:"",loc:"",sex:"",age:""},
-  mapMode:"cum",wk:0,epiBy:"Serotype",treeColor:"Lineage",treeGap:6,treeView:"focus",trendSero:"All",play:null};
+  f:{sero:new Set(),geno:"",loc:"",sex:"",age:"",pcr:""},
+  mapMode:"cum",wk:0,epiBy:"Serotype",epiShow:"both",treeColor:"Lineage",treeGap:6,treeView:"focus",trendSero:"All",play:null};
 
 /* ---------- parsing ---------- */
 function findCol(cols,tests){for(const t of tests){const c=cols.find(k=>t.test(k.trim()));if(c)return c}return null}
@@ -398,7 +405,7 @@ function buildFilters(){
   $("#fLoc").innerHTML=`<option value="">All</option>`+locs.map(l=>`<option>${esc(l)}</option>`).join("");
   const bands=AGE_BANDS.map(([l,h])=>h>=200?l+"+":l+"–"+h);
   $("#fAge").innerHTML=`<option value="">All</option>`+bands.map(b=>`<option>${b}</option>`).join("");
-  ["fGeno","fLoc","fSex","fAge"].forEach(id=>$("#"+id).value="");S.f.geno=S.f.loc=S.f.sex=S.f.age="";
+  ["fGeno","fLoc","fSex","fAge","fPcr"].forEach(id=>$("#"+id).value="");S.f.geno=S.f.loc=S.f.sex=S.f.age=S.f.pcr="";
   $("#trendSero").innerHTML=`<option>All</option>`+present.filter(s=>s!=="Untyped").map(s=>`<option>${s}</option>`).join("")+(lins.some(l=>l[0]===FOCUS)?`<option>${FOCUS}</option>`:"");
   $("#trendSero").value=S.trendSero=(lins.some(l=>l[0]===FOCUS)?FOCUS:"All");
 }
@@ -465,33 +472,47 @@ function renderMap(){
   const g=d3.groups(T,r=>r.Locality).map(([loc,rs])=>{const P=rs.filter(r=>r.pos&&linOk(r));
     return{loc,lat:d3.mean(rs,r=>r.Lat),lon:d3.mean(rs,r=>r.Long),n:rs.length,pos:P.length,
       sero:d3.rollups(P,v=>v.length,r=>r.Serotype||"Untyped").sort((a,b)=>SEROS.indexOf(a[0])-SEROS.indexOf(b[0])),
-      lin:d3.rollups(P.filter(r=>r.Lineage),v=>v.length,r=>r.Lineage).sort((a,b)=>b[1]-a[1])}}).sort((a,b)=>b.pos-a.pos);
-  const maxPos=d3.max(tested().filter(r=>r.pos&&linOk(r)).length?d3.rollups(tested().filter(r=>r.pos&&linOk(r)),v=>v.length,r=>r.Locality).map(d=>d[1]):[1])||1;
+      lin:d3.rollups(P.filter(r=>r.Lineage),v=>v.length,r=>r.Lineage).sort((a,b)=>b[1]-a[1]),neg:rs.filter(r=>!r.pos).length}});
+  const mode=S.f.pcr;const cPos=css("--s8"),cNeg=css("--neg");
+  g.forEach(d=>{
+    if(mode==="pos"){d.v=d.pos;d.parts=d.sero.map(([s,n])=>[s,n,colOf("Serotype",s)])}
+    else if(mode==="neg"){d.v=d.neg;d.parts=[["PCR negative",d.neg,cNeg]]}
+    else{d.v=d.pos+d.neg;d.parts=[["PCR positive",d.pos,cPos],["PCR negative",d.neg,cNeg]].filter(x=>x[1])}});
+  g.sort((a,b)=>b.v-a.v);
+  const measure=r=>mode==="pos"?(r.pos&&linOk(r)):mode==="neg"?!r.pos:(!r.pos||linOk(r));
+  const allM=tested().filter(r=>isFinite(r.Lat)&&isFinite(r.Long)&&measure(r));
+  const maxPos=(allM.length?d3.max(d3.rollups(allM,v=>v.length,r=>r.Locality),d=>d[1]):1)||1;
+  const unit=mode==="pos"?"positives":mode==="neg"?"negatives":"tested";
   const rs=d3.scaleSqrt().domain([0,maxPos]).range([0,Math.max(18,W/22)]);
   const pie=d3.pie().value(d=>d[1]).sort(null);
   const nodes=svg.append("g").selectAll("g").data(g.slice().reverse()).join("g").attr("transform",d=>`translate(${proj([d.lon,d.lat])})`).style("cursor","default");
-  nodes.filter(d=>!d.pos).append("circle").attr("r",3.5).attr("fill","none").attr("stroke",css("--muted")).attr("stroke-width",1.2);
-  nodes.filter(d=>d.pos).each(function(d){const r=Math.max(4,rs(d.pos));const sel=d3.select(this);
+  nodes.filter(d=>!d.v).append("circle").attr("r",3.5).attr("fill","none").attr("stroke",css("--muted")).attr("stroke-width",1.2);
+  nodes.filter(d=>d.v).each(function(d){const r=Math.max(4,rs(d.v));const sel=d3.select(this);
     sel.append("circle").attr("r",r+2).attr("fill",css("--panel"));
-    sel.selectAll("path").data(pie(d.sero)).join("path").attr("d",d3.arc().innerRadius(0).outerRadius(r)).attr("fill",a=>colOf("Serotype",a.data[0])).attr("stroke",css("--panel")).attr("stroke-width",d.sero.length>1?1:0)});
-  nodes.append("circle").attr("r",d=>Math.max(10,rs(d.pos)+4)).attr("fill","transparent")
-    .on("mousemove",(e,d)=>showTip(e,`<b>${esc(d.loc)}</b><div class="row"><span>Tested</span><span class="num">${fmt(d.n)}</span></div><div class="row"><span>Positive</span><span class="num">${fmt(d.pos)} (${pct(d.pos/d.n)})</span></div>`+
+    sel.selectAll("path").data(pie(d.parts)).join("path").attr("d",d3.arc().innerRadius(0).outerRadius(r)).attr("fill",a=>a.data[2]).attr("stroke",css("--panel")).attr("stroke-width",d.parts.length>1?1:0);
+    if(d.parts.some(x=>x[0]==="PCR negative"))sel.append("circle").attr("r",r).attr("fill","none").attr("stroke",css("--muted")).attr("stroke-width",1).attr("stroke-opacity",.8)});
+  nodes.append("circle").attr("r",d=>Math.max(10,rs(d.v)+4)).attr("fill","transparent")
+    .on("mousemove",(e,d)=>showTip(e,`<b>${esc(d.loc)}</b><div class="row"><span>Tested</span><span class="num">${fmt(d.n)}</span></div><div class="row"><span>Positive</span><span class="num">${fmt(d.pos)} (${pct(d.pos/d.n)})</span></div><div class="row"><span>Negative</span><span class="num">${fmt(d.neg)}</span></div>`+
       d.sero.map(([s,n])=>`<div class="row"><span><i style="background:${colOf("Serotype",s)}"></i>${s}</span><span class="num">${n}</span></div>`).join("")+
       (d.lin.length?`<div style="margin-top:4px;color:var(--muted)">Genotypes: ${d.lin.map(([l,n])=>esc(l)+" ("+n+")").join(", ")}</div>`:"")))
     .on("mouseleave",hideTip);
   // labels for top localities, with simple collision avoidance
-  const placed=[];svg.append("g").selectAll("text").data(g.filter(d=>d.pos).slice(0,12)).join("text").each(function(d){
-    const [x,y]=proj([d.lon,d.lat]);const r=Math.max(4,rs(d.pos));let lx=x+r+4,ly=y+4;const w=d.loc.length*6.2;
+  const placed=[];svg.append("g").selectAll("text").data(g.filter(d=>d.v).slice(0,12)).join("text").each(function(d){
+    const [x,y]=proj([d.lon,d.lat]);const r=Math.max(4,rs(d.v));let lx=x+r+4,ly=y+4;const w=d.loc.length*6.2;
     if(placed.some(p=>Math.abs(p[1]-ly)<12&&lx<p[0]+p[2]&&lx+w>p[0])){d3.select(this).remove();return}
     placed.push([lx,ly,w]);d3.select(this).attr("x",lx).attr("y",ly).style("font-weight",600).style("fill",css("--ink")).style("paint-order","stroke").style("stroke",css("--land")).style("stroke-width",3).text(d.loc)});
   // size legend
-  const lg=svg.append("g").attr("transform",`translate(${W-16},${H-16})`);const vals=[maxPos,Math.round(maxPos/4)].filter(v=>v>0);
+  const lg=svg.append("g").attr("transform",`translate(${W-16},${16+2*rs(maxPos)+14})`);const vals=[maxPos,Math.round(maxPos/4)].filter(v=>v>0);
   vals.forEach(v=>{lg.append("circle").attr("cx",-rs(maxPos)).attr("cy",-rs(v)).attr("r",rs(v)).attr("fill","none").attr("stroke",css("--muted"));
     lg.append("text").attr("x",-rs(maxPos)).attr("y",-2*rs(v)-3).attr("text-anchor","middle").style("font-size","10px").text(v)});
-  lg.append("text").attr("x",-rs(maxPos)*2-6).attr("y",-4).attr("text-anchor","end").style("font-size","10.5px").text("positives");
+  lg.append("text").attr("x",-rs(maxPos)*2-6).attr("y",-4).attr("text-anchor","end").style("font-size","10.5px").text(unit);
   el.replaceChildren(svg.node());
   const sp=new Set(g.flatMap(d=>d.sero.map(s=>s[0])));
-  $("#mapLegend").innerHTML=[...SEROS,"Untyped"].filter(s=>sp.has(s)).map(s=>`<span><i class="c" style="background:var(${SERO_VAR[s]})"></i>${s}</span>`).join("")+`<span><i class="c" style="border:1.5px solid var(--muted)"></i>Tested, no positives</span>`;
+  const none=mode==="pos"?"Tested, no positives":mode==="neg"?"No negatives":"No samples";
+  $("#mapLegend").innerHTML=(mode==="pos"?[...SEROS,"Untyped"].filter(s=>sp.has(s)).map(s=>`<span><i class="c" style="background:var(${SERO_VAR[s]})"></i>${s}</span>`).join("")
+    :(mode==="neg"?"":`<span><i class="c" style="background:var(--s8)"></i>PCR positive</span>`)+`<span><i class="c" style="background:var(--neg);outline:1px solid var(--muted);outline-offset:-1px"></i>PCR negative</span>`)
+    +(g.some(d=>!d.v)?`<span><i class="c" style="border:1.5px solid var(--muted)"></i>${none}</span>`:"");
+  $("#mapSub").textContent=mode==="pos"?"PCR-positive cases by locality. Circle area = positives; slices = serotype share.":mode==="neg"?"PCR-negative samples by locality. Circle area = negatives.":"Samples tested by locality. Circle area = samples tested; slices = PCR positive vs negative. Choose “Positive” in the PCR result filter to split by serotype.";
   $("#mapSlider").hidden=!(S.hasDate&&S.weeks.length);
 }
 
@@ -535,13 +556,15 @@ function renderMatrix(){
 function renderEpi(){
   const el=$("#epi"),el2=$("#posrate");
   if(!S.hasDate||!S.weeks.length){el.innerHTML=`<div class="empty">No date column in the CSV, so the epicurve cannot be drawn. Add a <code class="mono">SamplingDate</code> (or onset date) column.</div>`;el2.innerHTML="";$("#epiLegend").innerHTML="";return}
-  const by=S.epiBy;const P=positives().filter(r=>r.week);
+  const by=S.epiBy;const P=S.f.pcr==="neg"?[]:positives().filter(r=>r.week);
   let keys;
   if(by==="Serotype"){keys=[...SEROS,"Untyped"].filter(k=>P.some(r=>(r.Serotype||"Untyped")===k))}
   else{keys=[...lineageColors.keys()].filter(k=>P.some(r=>r.Lineage===k));if(P.some(r=>!r.Lineage))keys.push("Not genotyped")}
-  const keyOf=r=>by==="Serotype"?(r.Serotype||"Untyped"):(r.Lineage||"Not genotyped");
-  const colK=k=>k==="Not genotyped"?css("--neutral"):colOf(by,k);
-  const data=S.weeks.map(w=>{const o={w};keys.forEach(k=>o[k]=0);P.forEach(r=>{if(+r.week===+w)o[keyOf(r)]++});return o});
+  const withNeg=S.f.pcr!=="pos";const N=withNeg?tested().filter(r=>r.week&&!r.pos):[];
+  const posKeys=keys.slice();if(withNeg)keys.push("Negative");
+  const keyOf=r=>!r.pos?"Negative":by==="Serotype"?(r.Serotype||"Untyped"):(r.Lineage||"Not genotyped");
+  const colK=k=>k==="Negative"?css("--neg"):k==="Not genotyped"?css("--neutral"):colOf(by,k);
+  const data=S.weeks.map(w=>{const o={w};keys.forEach(k=>o[k]=0);P.concat(N).forEach(r=>{if(+r.week===+w)o[keyOf(r)]++});return o});
   const st=d3.stack().keys(keys)(data);
   const W=Math.max(300,el.clientWidth),H=Math.round(Math.min(320,Math.max(220,W*0.26))),m={t:10,r:8,b:26,l:40};
   const x=d3.scaleBand().domain(S.weeks.map(d=>+d)).range([m.l,W-m.r]).paddingInner(0.12);
@@ -552,18 +575,18 @@ function renderEpi(){
   const every=Math.ceil(40/x.bandwidth());
   svg.append("g").attr("class","axis").attr("transform",`translate(0,${H-m.b})`).call(d3.axisBottom(x).tickSizeOuter(0).tickFormat((d,i)=>i%every===0?wkShort(new Date(d)):""));
   const gap=1;
-  svg.append("g").selectAll("g").data(st).join("g").attr("fill",s=>colK(s.key)).selectAll("rect").data(s=>s.map(d=>Object.assign(d,{key:s.key}))).join("rect")
+  svg.append("g").selectAll("g").data(st).join("g").attr("fill",s=>colK(s.key)).attr("stroke",s=>s.key==="Negative"?css("--muted"):null).attr("stroke-width",s=>s.key==="Negative"?.6:null).attr("stroke-opacity",.5).selectAll("rect").data(s=>s.map(d=>Object.assign(d,{key:s.key}))).join("rect")
     .attr("x",d=>x(+d.data.w)).attr("width",x.bandwidth()).attr("y",d=>y(d[1])+(d[1]>d[0]?gap:0)).attr("height",d=>Math.max(0,y(d[0])-y(d[1])-(d[1]>d[0]?gap:0)));
-  const tot=d=>keys.reduce((s,k)=>s+d[k],0);
+  const tot=d=>keys.reduce((s,k)=>s+d[k],0);const totP=d=>posKeys.reduce((s,k)=>s+d[k],0);
   svg.append("g").selectAll("rect").data(data).join("rect").attr("x",d=>x(+d.w)-x.step()*x.paddingInner()/2).attr("width",x.step()).attr("y",m.t).attr("height",H-m.b-m.t).attr("fill","transparent")
     .on("mousemove",(e,d)=>showTip(e,`<b>${wkLabel(d.w)}</b><div style="color:var(--muted)">${d3.utcFormat("%d %b")(d.w)}–${d3.utcFormat("%d %b")(new Date(+d.w+6*864e5))}</div>`+
-      keys.slice().reverse().filter(k=>d[k]).map(k=>`<div class="row"><span><i style="background:${colK(k)}"></i>${esc(k)}</span><span class="num">${d[k]}</span></div>`).join("")+`<div class="row" style="border-top:1px solid var(--line);margin-top:3px;padding-top:3px"><span>Total positives</span><span class="num">${tot(d)}</span></div>`))
+      keys.slice().reverse().filter(k=>d[k]).map(k=>`<div class="row"><span><i style="background:${colK(k)}"></i>${esc(k)}</span><span class="num">${d[k]}</span></div>`).join("")+`<div class="row" style="border-top:1px solid var(--line);margin-top:3px;padding-top:3px"><span>Positive</span><span class="num">${totP(d)}</span></div>`+(withNeg?`<div class="row"><span>Tested</span><span class="num">${tot(d)} (${pct(totP(d)/tot(d))} positive)</span></div>`:"")))
     .on("mouseleave",hideTip);
   // label the peak
   const pk=data.reduce((a,b)=>tot(b)>tot(a)?b:a,data[0]);if(tot(pk))svg.append("text").attr("x",x(+pk.w)+x.bandwidth()/2).attr("y",y(tot(pk))-5).attr("text-anchor","middle").style("font-size","11px").style("font-weight",600).style("fill",css("--ink")).text(tot(pk));
-  svg.append("text").attr("x",m.l).attr("y",m.t-1).style("font-size","10.5px").style("fill",css("--muted")).text("");
+  svg.append("text").attr("x",m.l+4).attr("y",m.t+10).style("font-size","10.5px").style("fill",css("--muted")).text(S.f.pcr==="neg"?"PCR-negative samples":withNeg?"Samples tested":"PCR-positive cases");
   el.replaceChildren(svg.node());
-  $("#epiLegend").innerHTML=keys.map(k=>`<span><i style="background:${colK(k)}"></i>${esc(k)}</span>`).join("");
+  $("#epiLegend").innerHTML=keys.map(k=>`<span><i style="background:${colK(k)}${k==="Negative"?";outline:1px solid var(--muted);outline-offset:-1px":""}"></i>${k==="Negative"?"PCR negative":esc(k)}</span>`).join("");
   // positivity small chart (own axis, same x)
   const T=tested().filter(r=>r.week);const pd=S.weeks.map(w=>{const t=T.filter(r=>+r.week===+w);return{w,n:t.length,p:t.filter(r=>r.pos).length}});
   const H2=110,m2={t:16,r:8,b:22,l:40};const y2=d3.scaleLinear().domain([0,Math.max(.1,d3.max(pd,d=>d.n?d.p/d.n:0))]).nice().range([H2-m2.b,m2.t]);
@@ -628,6 +651,36 @@ function renderTree(){
   $("#treeInfo").innerHTML=(viewNote?`<p style="margin:0 0 8px">${viewNote}</p>`:"")+`<dl><dt>Tips</dt><dd>${fmt(leaves.length)}</dd><dt>Matched to CSV</dt><dd>${fmt(matched.length)}</dd><dt>References</dt><dd>${fmt(leaves.length-matched.length)}</dd><dt>Root-to-tip max</dt><dd>${d3.format(".4f")(maxD)}</dd>${unmatchedRows>0?`<dt>Genotyped, not in tree</dt><dd>${fmt(unmatchedRows)}</dd>`:""}</dl>`;
 }
 
+/* ---------- PCR donut ---------- */
+function renderPcr(){
+  const el=$("#pcrPie");const T=tested();const mode=S.f.pcr;
+  let parts,title,sub,center,centerLab;
+  if(mode==="pos"){const P=positives();
+    parts=[...SEROS,"Untyped"].map(k=>({k,label:k==="Untyped"?"Positive, untyped":k,n:P.filter(r=>(r.Serotype||"Untyped")===k).length,c:colOf("Serotype",k)})).filter(d=>d.n);
+    title="Positives by serotype";sub="PCR-positive samples split by serotype.";center=P.length;centerLab="positives"}
+  else{const pos=positives().length,neg=T.filter(r=>!r.pos).length;
+    parts=[{k:"pos",label:"PCR positive",n:pos,c:css("--s8")},{k:"neg",label:"PCR negative",n:neg,c:css("--neg")}].filter(d=>mode!=="neg"||d.k==="neg");
+    title="PCR results";sub=mode==="neg"?"PCR-negative samples.":"Share of tested samples. Choose “Positive” in the PCR result filter to split positives by serotype.";center=d3.sum(parts,d=>d.n);centerLab=mode==="neg"?"negatives":"tested"}
+  $("#pcrTitle").textContent=title;$("#pcrSub").textContent=sub;
+  const tot=d3.sum(parts,d=>d.n);
+  if(!tot){el.innerHTML=`<div class="empty">No samples match the filters.</div>`;$("#pcrLegend").innerHTML="";return}
+  const W=Math.max(240,el.clientWidth),H=Math.min(260,W*0.8),R0=Math.min(H/2-26,W/2-70),r=R0;
+  const svg=d3.create("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","img").attr("aria-label",title);
+  const g=svg.append("g").attr("transform",`translate(${W/2},${H/2})`);
+  const arcs=d3.pie().value(d=>d.n).sort(null).padAngle(parts.length>1?0.012:0)(parts);
+  const arc=d3.arc().innerRadius(r*0.58).outerRadius(r).cornerRadius(2);
+  g.selectAll("path").data(arcs).join("path").attr("d",arc).attr("fill",d=>d.data.c).attr("stroke",d=>d.data.k==="neg"?css("--muted"):"none").attr("stroke-opacity",.5).attr("stroke-width",.6)
+    .on("mousemove",(e,d)=>showTip(e,`<b>${esc(d.data.label)}</b><div class="row"><span>Samples</span><span class="num">${fmt(d.data.n)}</span></div><div class="row"><span>Share</span><span class="num">${pct(d.data.n/tot)}</span></div>`)).on("mouseleave",hideTip);
+  const lab=d3.arc().innerRadius(r+14).outerRadius(r+14);
+  g.selectAll("text.p").data(arcs.filter(d=>d.endAngle-d.startAngle>0.18)).join("text").attr("class","p num").attr("transform",d=>`translate(${lab.centroid(d)})`)
+    .attr("text-anchor",d=>{const m=(d.startAngle+d.endAngle)/2;return m<0.3||Math.abs(m-Math.PI)<0.3||m>2*Math.PI-0.3?"middle":m<Math.PI?"start":"end"}).attr("dy","0.35em")
+    .style("font-weight",600).style("fill",css("--ink")).text(d=>pct(d.data.n/tot));
+  g.append("text").attr("text-anchor","middle").attr("dy","-0.1em").style("font-family",css("--f-display")).style("font-size","22px").style("font-weight",600).style("fill",css("--ink")).attr("class","num").text(fmt(center));
+  g.append("text").attr("text-anchor","middle").attr("dy","1.4em").style("font-size","11.5px").style("fill",css("--muted")).text(centerLab);
+  el.replaceChildren(svg.node());
+  $("#pcrLegend").innerHTML=parts.map(d=>`<span><i style="background:${d.c}${d.k==="neg"?";outline:1px solid var(--muted);outline-offset:-1px":""}"></i>${esc(d.label)} <span class="num" style="color:var(--muted)">${fmt(d.n)}</span></span>`).join("");
+}
+
 /* ---------- age/sex ---------- */
 function renderPyr(){
   const el=$("#pyr");const P=positives().filter(r=>r.band);
@@ -652,7 +705,7 @@ function renderPyr(){
 function renderLL(){
   if(!$("#ll"))return;
   const q=($("#llSearch").value||"").toLowerCase();
-  const P=tested().filter(r=>!r.pos||linOk(r)).filter(r=>!q||[r.ID,r.Locality,r.Lineage,r.Serotype].join(" ").toLowerCase().includes(q))
+  const P=tested().filter(r=>!r.pos||linOk(r)).filter(r=>!S.f.pcr||(S.f.pcr==="pos")===r.pos).filter(r=>!q||[r.ID,r.Locality,r.Lineage,r.Serotype].join(" ").toLowerCase().includes(q))
     .sort((a,b)=>(b.date||0)-(a.date||0)||b.ID.localeCompare(a.ID));
   const show=P.slice(0,150);
   $("#llCount").textContent=`Showing ${fmt(show.length)} of ${fmt(P.length)} samples, most recent first.`;
@@ -661,7 +714,7 @@ function renderLL(){
 }
 
 /* ---------- orchestration ---------- */
-function render(){renderKpis();renderMap();renderMatrix();renderEpi();renderTree();renderPyr();renderLL()}
+function render(){renderKpis();renderMap();renderMatrix();renderEpi();renderTree();renderPcr();renderPyr();renderLL()}
 function afterLoad(){buildColorMaps();buildFilters();$("#wkRange").max=Math.max(0,S.weeks.length-1);$("#wkRange").value=S.wk;render()}
 function setSrc(live,txt){$("#srcChip").classList.toggle("live",live);$("#srcTxt").textContent=txt}
 
@@ -685,11 +738,13 @@ $("#fGeno").onchange=e=>{S.f.geno=e.target.value;render()};
 $("#fLoc").onchange=e=>{S.f.loc=e.target.value;render()};
 $("#fSex").onchange=e=>{S.f.sex=e.target.value;render()};
 $("#fAge").onchange=e=>{S.f.age=e.target.value;render()};
+$("#fPcr").onchange=e=>{S.f.pcr=e.target.value;render()};
 $("#trendSero").onchange=e=>{S.trendSero=e.target.value;renderMatrix()};
 if($("#llSearch"))$("#llSearch").oninput=renderLL;
 function seg(id,fn){const g=$(id);g.querySelectorAll("button").forEach(b=>b.onclick=()=>{g.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));fn(b.dataset.v)})}
 seg("#mapMode",v=>{S.mapMode=v;renderMap()});
 seg("#epiBy",v=>{S.epiBy=v;renderEpi()});
+
 seg("#treeColor",v=>{S.treeColor=v;renderTree()});
 seg("#treeView",v=>{S.treeView=v;renderTree()});
 seg("#treeDensity",v=>{S.treeGap=+v;renderTree()});
@@ -714,20 +769,20 @@ function baseName(){return (S.csvName||"example").replace(/\.[^.]+$/,"").replace
 function cleanClone(){
   const c=document.documentElement.cloneNode(true);
   const ll=c.querySelector("#llPanel");if(ll)ll.remove();
-  const py=c.querySelector("#pyrPanel");if(py){py.classList.remove("c4");py.classList.add("c12")}
+  ["#pyrPanel","#pcrPanel"].forEach(s=>{const e=c.querySelector(s);if(e){e.classList.remove("c4","c8");e.classList.add("c6")}});
   c.querySelectorAll("script:not([data-keep])").forEach(s=>s.remove());
   c.querySelector("#tip").hidden=true;c.querySelector("#toast").hidden=true;c.querySelector("#tip").innerHTML="";
   return c;
 }
 function filterSummary(){const f=S.f,p=[];
   if(f.sero.size)p.push("Serotype: "+[...f.sero].filter(s=>s!=="__none").join(", ")||"none");
-  if(f.geno)p.push("Genotype: "+f.geno);if(f.loc)p.push("Locality: "+f.loc);if(f.sex)p.push("Sex: "+(f.sex==="F"?"Female":"Male"));if(f.age)p.push("Age: "+f.age);
+  if(f.geno)p.push("Genotype: "+f.geno);if(f.loc)p.push("Locality: "+f.loc);if(f.sex)p.push("Sex: "+(f.sex==="F"?"Female":"Male"));if(f.age)p.push("Age: "+f.age);if(f.pcr)p.push("PCR: "+(f.pcr==="pos"?"Positive":"Negative"));
   return p.length?p.join(" · "):"none (all samples)"}
 function saveApp(){
   const c=cleanClone();
   const seed={example:!S.csvText,csv:S.csvText,csvName:S.csvName,nwk:S.nwkText,nwkName:S.nwkName,savedAt:new Date().toISOString()};
   c.querySelector("#seed").textContent=JSON.stringify(seed).replace(/</g,"\\u003c");
-  ["#map","#matrix","#epi","#posrate","#tree","#pyr","#kpis","#mapLegend","#epiLegend","#treeLegend","#treeInfo"].forEach(s=>{const e=c.querySelector(s);if(e)e.innerHTML=""});
+  ["#map","#matrix","#epi","#posrate","#tree","#pyr","#pcrPie","#pcrLegend","#kpis","#mapLegend","#epiLegend","#treeLegend","#treeInfo"].forEach(s=>{const e=c.querySelector(s);if(e)e.innerHTML=""});
   c.removeAttribute("data-theme");
   saveFile(`DENV_dashboard_${baseName()}_${stamp()}.html`,"<!doctype html>\n"+c.outerHTML);
 }
