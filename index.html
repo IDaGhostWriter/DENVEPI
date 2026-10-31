@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DENV-2/GVI Genomic Surveillance</title>
+<title>DENVEPI</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -40,6 +40,32 @@ h2{font-size:17px;font-weight:600}
 .sub{color:var(--ink-2);margin:4px 0 0;max-width:72ch}
 .mono{font-family:var(--f-mono);font-size:12.5px}
 .num{font-variant-numeric:tabular-nums}
+.brand{display:flex;align-items:center;gap:12px;margin-top:6px}
+.mark{width:52px;height:52px;flex:none}
+.wordmark{font-size:clamp(28px,4vw,36px);font-weight:700;letter-spacing:.02em;line-height:1}
+.wordmark .w1{color:var(--ink)}.wordmark .w2{color:var(--accent)}
+.wordmark span{display:inline-block}
+.tagline{font-family:var(--f-mono);font-size:12px;letter-spacing:.04em;color:var(--ink-2);margin-top:5px;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center}
+.credit{display:inline-flex;align-items:center;gap:8px;color:var(--muted)}
+.credit i{display:inline-block;width:22px;height:2px;border-radius:2px;background:var(--s2);transform-origin:left}
+@media (prefers-reduced-motion:no-preference){
+  .mark .m-hex,.mark .m-spk{transform-box:view-box;transform-origin:24px 24px}
+  .mark .m-hex{animation:mHex .7s cubic-bezier(.2,.8,.2,1) both}
+  .mark .m-spk{animation:mSpk .6s .45s cubic-bezier(.2,.8,.2,1) both}
+  .mark .m-bar{transform-box:fill-box;transform-origin:50% 100%;animation:mBar .45s cubic-bezier(.2,.8,.2,1) both}
+  .mark .m-b1{animation-delay:.9s}.mark .m-b2{animation-delay:1.1s}.mark .m-b3{animation-delay:1.3s}
+  .mark .m-dot{animation:mDot .6s 1.7s cubic-bezier(.3,1.4,.5,1) both}
+  .wordmark .w1{animation:mWord .6s 1.7s ease-out both}.wordmark .w2{animation:mWord .6s 2.1s ease-out both}
+  .tagline .w3{animation:mFade .6s 2.5s ease-out both}
+  .credit{animation:mFade .6s 3s ease-out both}.credit i{animation:mLine .6s 2.9s ease-out both}
+}
+@keyframes mHex{0%{transform:scale(0) rotate(-60deg);opacity:0}70%{transform:scale(1.08) rotate(4deg);opacity:1}100%{transform:none;opacity:1}}
+@keyframes mSpk{0%{transform:scale(.55) rotate(-30deg);opacity:0}70%{transform:scale(1.06);opacity:1}100%{transform:none;opacity:1}}
+@keyframes mBar{from{transform:scaleY(0)}to{transform:none}}
+@keyframes mDot{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
+@keyframes mWord{from{transform:translateX(-10px);opacity:0}to{transform:none;opacity:1}}
+@keyframes mFade{from{transform:translateY(4px);opacity:0}to{transform:none;opacity:1}}
+@keyframes mLine{from{transform:scaleX(0)}to{transform:none}}
 header.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 24px;border-bottom:2px solid var(--ink);padding-bottom:14px}
 .src{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 10px;font-size:12.5px;color:var(--ink-2)}
@@ -139,8 +165,17 @@ footer{color:var(--muted);font-size:12.5px}
 <div class="wrap">
 <header class="top">
   <div>
-    <div class="eyebrow">Epidemic intelligence · Arbovirus genomic surveillance</div>
-    <h1>DENV-2/GVI Genomic Surveillance</h1>
+    <div class="eyebrow">Dengue Virus Epidemic Intelligence · Dr Idrissa DIENG (Native Mechanic)</div>
+    <div class="brand">
+    <svg class="mark" viewBox="0 0 48 48" aria-hidden="true">
+      <g class="m-spk"><g stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"><path d="M24 6V2.5M39.6 15l3-1.75M39.6 33l3 1.75M24 42v3.5M8.4 33l-3 1.75M8.4 15l-3-1.75"/></g>
+      <g fill="var(--accent)"><circle cx="24" cy="2.5" r="2.2"/><circle cx="42.6" cy="13.25" r="2.2"/><circle cx="42.6" cy="34.75" r="2.2"/><circle cx="24" cy="45.5" r="2.2"/><circle cx="5.4" cy="34.75" r="2.2"/><circle cx="5.4" cy="13.25" r="2.2"/></g></g>
+      <path class="m-hex" d="M24 6L39.6 15V33L24 42L8.4 33V15Z" fill="var(--accent)" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>
+      <g fill="var(--accent-ink)"><rect class="m-bar m-b1" x="14.5" y="28" width="4.6" height="6" rx="1.2"/><rect class="m-bar m-b2" x="20.7" y="23" width="4.6" height="11" rx="1.2"/><rect class="m-bar m-b3" x="26.9" y="18" width="4.6" height="16" rx="1.2"/></g>
+      <circle class="m-dot" cx="29.2" cy="13.2" r="2.6" fill="var(--s2)" stroke="var(--accent-ink)" stroke-width="1"/>
+    </svg>
+    <div><h1 class="wordmark"><span class="w1">DENV</span><span class="w2">EPI</span></h1><div class="tagline"><span class="w3">DENV Epi & Genomic Surveillance in Senegal</span><span class="credit"><i></i>by TheNativeMechanic</span></div></div>
+    </div>
     <p class="sub">Dengue cases, serotypes and genotypes by place and epi-week, with the phylogeny of sequenced samples. Load a line list (CSV) and a Newick tree to update every panel.</p>
   </div>
   <div class="src">
@@ -289,7 +324,7 @@ footer{color:var(--muted);font-size:12.5px}
     <div><code>SamplingDate</code> optional; any column whose name contains “date”, “onset”, “collect” or “prelev” (YYYY-MM-DD or DD/MM/YYYY). Needed for the epicurve and time slider.</div>
   </div>
 </details>
-<footer>Figures recompute in your browser from the loaded files; nothing is uploaded or stored. Example data is synthetic and for layout only.</footer>
+<footer>Figures recompute in your browser from the loaded files; nothing is uploaded or stored. Example data is synthetic and for layout only. DENVEPI by TheNativeMechanic.</footer>
 </div>
 <div id="tip" hidden></div>
 <div class="toast" id="toast" hidden></div>
@@ -313,7 +348,8 @@ const SAMPLE_NWK="(((((((((((((IPD-DENV-0011:0.0024,IPD-DENV-0120:0.0025):0.0017
 <script data-keep>
 (function(){
 "use strict";
-const $=s=>document.querySelector(s);
+const DUMMY=document.createElement("div");
+const $=s=>document.querySelector(s)||DUMMY; // saved copies drop some controls; missing ones become a harmless stand-in
 const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const fmt=d3.format(",");
 const pct=v=>isFinite(v)?(v*100).toFixed(1)+"%":"—";
@@ -703,7 +739,7 @@ function renderPyr(){
 
 /* ---------- line list ---------- */
 function renderLL(){
-  if(!$("#ll"))return;
+  if(!document.querySelector("#ll"))return;
   const q=($("#llSearch").value||"").toLowerCase();
   const P=tested().filter(r=>!r.pos||linOk(r)).filter(r=>!S.f.pcr||(S.f.pcr==="pos")===r.pos).filter(r=>!q||[r.ID,r.Locality,r.Lineage,r.Serotype].join(" ").toLowerCase().includes(q))
     .sort((a,b)=>(b.date||0)-(a.date||0)||b.ID.localeCompare(a.ID));
@@ -768,6 +804,9 @@ function stamp(){const d=new Date(),p=n=>String(n).padStart(2,"0");return `${d.g
 function baseName(){return (S.csvName||"example").replace(/\.[^.]+$/,"").replace(/[^\w.-]+/g,"_")}
 function cleanClone(){
   const c=document.documentElement.cloneNode(true);
+  c.querySelectorAll('meta[http-equiv],base').forEach(e=>e.remove());
+  // carry the on-screen filter choices into the file (select values are not part of the HTML otherwise)
+  document.querySelectorAll("select[id]").forEach(s=>{const k=c.querySelector("#"+s.id);if(!k)return;k.querySelectorAll("option").forEach((o,i)=>{if(i===s.selectedIndex)o.setAttribute("selected","");else o.removeAttribute("selected")})});
   const ll=c.querySelector("#llPanel");if(ll)ll.remove();
   ["#pyrPanel","#pcrPanel"].forEach(s=>{const e=c.querySelector(s);if(e){e.classList.remove("c4","c8");e.classList.add("c6")}});
   c.querySelectorAll("script:not([data-keep])").forEach(s=>s.remove());
@@ -782,9 +821,11 @@ function saveApp(){
   const c=cleanClone();
   const seed={example:!S.csvText,csv:S.csvText,csvName:S.csvName,nwk:S.nwkText,nwkName:S.nwkName,savedAt:new Date().toISOString()};
   c.querySelector("#seed").textContent=JSON.stringify(seed).replace(/</g,"\\u003c");
-  ["#map","#matrix","#epi","#posrate","#tree","#pyr","#pcrPie","#pcrLegend","#kpis","#mapLegend","#epiLegend","#treeLegend","#treeInfo"].forEach(s=>{const e=c.querySelector(s);if(e)e.innerHTML=""});
+  // keep the rendered charts in the file: phone previews (iOS Files, mail and chat apps) show HTML without running scripts
   c.removeAttribute("data-theme");
-  saveFile(`DENV_dashboard_${baseName()}_${stamp()}.html`,"<!doctype html>\n"+c.outerHTML);
+  c.querySelectorAll(".databar,#exports,details,#msg").forEach(e=>e.remove());
+  const sub=c.querySelector(".sub");if(sub)sub.textContent=`Saved copy built from ${S.csvName||"the example data"}${S.nwkName?" and "+S.nwkName:""} on ${new Date().toLocaleDateString()}. Data is read-only; filters, the map timeline and hover details still work.`;
+  saveFile(`DENVEPI_dashboard_${baseName()}_${stamp()}.html`,"<!doctype html>\n"+c.outerHTML);
 }
 function saveSnap(){
   const c=cleanClone();
@@ -796,9 +837,9 @@ function saveSnap(){
   note.innerHTML=`<b>Snapshot</b> generated ${esc(new Date().toLocaleString())}<br>Line list: ${esc(S.csvName||"example data (synthetic)")} · Tree: ${esc(S.nwkName||(S.tree?"example tree":"none"))}<br>Filters: ${esc(filterSummary())}${S.hasDate&&S.weeks.length?` · Map: ${esc($("#wkLabel").textContent)} (${S.mapMode==="cum"?"cumulative":"single week"})`:""}`;
   const hdr=c.querySelector("header.top");hdr.after(note);
   c.querySelector("#srcTxt").textContent=S.csvName||"Example data (synthetic)";
-  const ft=c.querySelector("footer");if(ft)ft.textContent="Static snapshot exported from the DENV-2/GVI Genomic Surveillance dashboard. Charts are frozen at export time.";
-  const t=c.querySelector("title");if(t)t.textContent="DENV snapshot "+stamp().replace("_"," ");
-  saveFile(`DENV_snapshot_${baseName()}_${stamp()}.html`,"<!doctype html>\n"+c.outerHTML);
+  const ft=c.querySelector("footer");if(ft)ft.textContent="Static snapshot exported from DENVEPI by TheNativeMechanic. Charts are frozen at export time.";
+  const t=c.querySelector("title");if(t)t.textContent="DENVEPI snapshot "+stamp().replace("_"," ");
+  saveFile(`DENVEPI_snapshot_${baseName()}_${stamp()}.html`,"<!doctype html>\n"+c.outerHTML);
 }
 $("#btnSaveApp").onclick=saveApp;
 $("#btnSaveSnap").onclick=saveSnap;
